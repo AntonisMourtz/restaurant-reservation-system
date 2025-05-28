@@ -9,23 +9,19 @@ public class TableMapper {
     // DTO -> Entity
     public static RestaurantTable TableRequestDtoToEntity(TableRequestDTO tableRequestDTO) {
         return new RestaurantTable(
-
                 tableRequestDTO.getTableId(),
                 tableRequestDTO.getTableName(),
                 tableRequestDTO.getTableCapacity(),
                 tableRequestDTO.isIndoor()
-
         );
     }
-    // DTO -> Entity
+    // Entity -> DTO
     public static TableResponseDTO EntityToTableResponseDto(RestaurantTable restaurantTable) {
         return new TableResponseDTO(
-
                 restaurantTable.getTableId(),
                 restaurantTable.getTableName(),
                 restaurantTable.getTableCapacity(),
                 restaurantTable.isIndoor()
-
         );
     }
 
