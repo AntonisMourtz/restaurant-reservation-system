@@ -5,7 +5,6 @@ import com.antonismourtz.restaurantreservationsystem.dtos.response.TableResponse
 
 import java.util.List;
 
-
 public interface TableService {
     TableResponseDTO createTable(TableRequestDTO tableRequestDTO);
 
@@ -16,6 +15,4 @@ public interface TableService {
     TableResponseDTO updateTable(long tableId, TableRequestDTO tableRequestDTO);
 
     void deleteTable(long tableId);
-
-
 }

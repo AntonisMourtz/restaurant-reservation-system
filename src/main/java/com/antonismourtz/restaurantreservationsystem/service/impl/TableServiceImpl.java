@@ -9,7 +9,6 @@ import com.antonismourtz.restaurantreservationsystem.repository.TableRepository;
 import com.antonismourtz.restaurantreservationsystem.service.TableService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,9 +40,9 @@ public class TableServiceImpl implements TableService {
     @Override
     public List<TableResponseDTO> getAllTables() {
         List<RestaurantTable> allTables = tableRepository.findAll();
+
         return allTables.stream().map((restaurantTable) -> TableMapper.EntityToTableResponseDto(restaurantTable))
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -56,15 +55,14 @@ public class TableServiceImpl implements TableService {
         restaurantTable.setIndoor(tableRequestDTO.isIndoor());
 
         RestaurantTable updatedRestaurantTable = tableRepository.save(restaurantTable);
+
         return TableMapper.EntityToTableResponseDto(updatedRestaurantTable);
     }
 
     @Override
     public void deleteTable(long tableId) {
-
         RestaurantTable restaurantTable = tableRepository.findById(tableId)
                 .orElseThrow(()-> new ResourceNotFoundException("Table not found with ID: " + tableId));
         tableRepository.delete(restaurantTable);
     }
-
 }
