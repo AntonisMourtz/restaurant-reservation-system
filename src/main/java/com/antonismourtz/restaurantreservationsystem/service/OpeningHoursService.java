@@ -16,4 +16,7 @@ public interface OpeningHoursService {
     OpeningHoursResponseDTO updateOpeningHoursByDay(DayOfWeek dayOfWeek, OpeningHoursRequestDTO openingHoursRequestDTO);
 
     void deleteAllOpeningHours();
+
+    void checkOpeningHoursRequest(OpeningHoursRequestDTO openingHoursRequestDTO);
+
 }
