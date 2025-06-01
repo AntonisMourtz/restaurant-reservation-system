@@ -4,7 +4,6 @@ import com.antonismourtz.restaurantreservationsystem.dtos.request.TableRequestDT
 import com.antonismourtz.restaurantreservationsystem.dtos.response.TableResponseDTO;
 import com.antonismourtz.restaurantreservationsystem.entity.RestaurantTable;
 
-
 public class TableMapper {
     // DTO -> Entity
     public static RestaurantTable TableRequestDtoToEntity(TableRequestDTO tableRequestDTO) {
@@ -24,5 +23,4 @@ public class TableMapper {
                 restaurantTable.isIndoor()
         );
     }
-
 }

@@ -17,9 +17,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> resourceNotFound(ResourceNotFoundException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
+
+    @ExceptionHandler(BusinessLogicException.class)
+    public ResponseEntity<?> businessLogic(BusinessLogicException ex) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     // General exception handler.
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> resourceNotFound(Exception ex) {
+    public ResponseEntity<?> handleOtherExceptions(Exception ex) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
     }
 
@@ -30,7 +36,5 @@ public class GlobalExceptionHandler {
         body.put("error", status.getReasonPhrase());
         body.put("message", message);
         return new ResponseEntity<>(body, status);
-
     }
-
 }
