@@ -17,12 +17,10 @@ public class OpeningHoursMapper {
 
     public static OpeningHoursResponseDTO MapToOpeningHoursResponseDTO(OpeningHours openingHours) {
         return new OpeningHoursResponseDTO(
-                openingHours.getDayId(),
                 openingHours.getDayOfWeek(),
                 openingHours.getOpenTime(),
                 openingHours.getCloseTime(),
                 openingHours.isOpen()
         );
     }
-
 }

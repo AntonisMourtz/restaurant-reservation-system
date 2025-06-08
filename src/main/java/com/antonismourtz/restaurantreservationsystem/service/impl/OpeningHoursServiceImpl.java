@@ -3,7 +3,6 @@ package com.antonismourtz.restaurantreservationsystem.service.impl;
 import com.antonismourtz.restaurantreservationsystem.dtos.request.OpeningHoursRequestDTO;
 import com.antonismourtz.restaurantreservationsystem.dtos.response.OpeningHoursResponseDTO;
 import com.antonismourtz.restaurantreservationsystem.entity.OpeningHours;
-import com.antonismourtz.restaurantreservationsystem.enums.DayOfWeek;
 import com.antonismourtz.restaurantreservationsystem.exception.BusinessLogicException;
 import com.antonismourtz.restaurantreservationsystem.exception.ResourceNotFoundException;
 import com.antonismourtz.restaurantreservationsystem.mapper.OpeningHoursMapper;
@@ -12,6 +11,7 @@ import com.antonismourtz.restaurantreservationsystem.service.OpeningHoursService
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,7 +63,6 @@ public class OpeningHoursServiceImpl implements OpeningHoursService {
 
     @Override
     public void checkOpeningHoursRequest(OpeningHoursRequestDTO openingHoursRequestDTO) {
-
         if (openingHoursRequestDTO.isOpen()==true &&
                 (openingHoursRequestDTO.getOpenTime()==null || openingHoursRequestDTO.getCloseTime()==null)) {
 
@@ -79,6 +78,5 @@ public class OpeningHoursServiceImpl implements OpeningHoursService {
 
             throw new BusinessLogicException("Opening time must be earlier than closing time.");
         }
-
     }
 }
