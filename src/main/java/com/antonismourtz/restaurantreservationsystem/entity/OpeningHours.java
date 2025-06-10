@@ -2,13 +2,14 @@ package com.antonismourtz.restaurantreservationsystem.entity;
 
 
 
-import com.antonismourtz.restaurantreservationsystem.enums.DayOfWeek;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Entity

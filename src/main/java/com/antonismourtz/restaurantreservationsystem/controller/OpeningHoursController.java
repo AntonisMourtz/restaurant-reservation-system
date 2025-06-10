@@ -2,13 +2,13 @@ package com.antonismourtz.restaurantreservationsystem.controller;
 
 import com.antonismourtz.restaurantreservationsystem.dtos.request.OpeningHoursRequestDTO;
 import com.antonismourtz.restaurantreservationsystem.dtos.response.OpeningHoursResponseDTO;
-import com.antonismourtz.restaurantreservationsystem.enums.DayOfWeek;
-import com.antonismourtz.restaurantreservationsystem.exception.ResourceNotFoundException;
 import com.antonismourtz.restaurantreservationsystem.service.OpeningHoursService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.DayOfWeek;
 import java.util.List;
 
 @RestController
