@@ -3,9 +3,11 @@ package com.antonismourtz.restaurantreservationsystem.service.impl;
 import com.antonismourtz.restaurantreservationsystem.dtos.request.TableRequestDTO;
 import com.antonismourtz.restaurantreservationsystem.dtos.response.TableResponseDTO;
 import com.antonismourtz.restaurantreservationsystem.entity.RestaurantTable;
+import com.antonismourtz.restaurantreservationsystem.exception.ActiveReservationsException;
 import com.antonismourtz.restaurantreservationsystem.exception.ResourceNotFoundException;
 import com.antonismourtz.restaurantreservationsystem.mapper.TableMapper;
 import com.antonismourtz.restaurantreservationsystem.repository.TableRepository;
+import com.antonismourtz.restaurantreservationsystem.service.ReservationService;
 import com.antonismourtz.restaurantreservationsystem.service.TableService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class TableServiceImpl implements TableService {
 
     private TableRepository tableRepository;
+    private ReservationService reservationService;
 
     @Override
     public TableResponseDTO createTable(TableRequestDTO tableRequestDTO) {
@@ -47,6 +50,10 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public TableResponseDTO updateTable(long tableId, TableRequestDTO tableRequestDTO) {
+        if(reservationService.existsActiveReservations()){
+            throw new ActiveReservationsException("Cannot modify tables. There are active reservations.");
+        }
+
         RestaurantTable restaurantTable = tableRepository.findById(tableId)
                 .orElseThrow(()-> new ResourceNotFoundException("Table not found with ID: " + tableId));
 
@@ -61,6 +68,9 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public void deleteTable(long tableId) {
+        if(reservationService.existsActiveReservations()){
+            throw new ActiveReservationsException("Cannot delete tables. There are active reservations.");
+        }
         RestaurantTable restaurantTable = tableRepository.findById(tableId)
                 .orElseThrow(()-> new ResourceNotFoundException("Table not found with ID: " + tableId));
         tableRepository.delete(restaurantTable);
