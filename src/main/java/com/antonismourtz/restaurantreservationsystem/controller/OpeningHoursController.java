@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.DayOfWeek;
 import java.util.List;
 
@@ -45,5 +44,4 @@ public class OpeningHoursController {
         openingHoursService.deleteAllOpeningHours();
         return ResponseEntity.ok("All opening hours have been deleted");
     }
-
 }

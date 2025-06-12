@@ -5,6 +5,7 @@ import com.antonismourtz.restaurantreservationsystem.dtos.response.ReservationRe
 import com.antonismourtz.restaurantreservationsystem.entity.Reservation;
 import com.antonismourtz.restaurantreservationsystem.entity.RestaurantTable;
 import com.antonismourtz.restaurantreservationsystem.exception.BusinessLogicException;
+import com.antonismourtz.restaurantreservationsystem.exception.ReservationNotPossibleException;
 import com.antonismourtz.restaurantreservationsystem.mapper.ReservationMapper;
 import com.antonismourtz.restaurantreservationsystem.repository.OpeningHoursRepository;
 import com.antonismourtz.restaurantreservationsystem.repository.ReservationRepository;
@@ -31,17 +32,18 @@ public class ReservationServiceImpl implements ReservationService {
         }
         // The restaurant must be open at this day
         if(!checkDayOfReservation(reservationRequestDTO)) {
-            throw new BusinessLogicException("The restaurant is closed at this day.");
+            throw new ReservationNotPossibleException("The restaurant is closed at this day.");
         }
         if(isReservationWithinOpeningHours(reservationRequestDTO)) {
-            throw new BusinessLogicException("Reservation time is outside of the restaurant's opening hours.");
+            throw new ReservationNotPossibleException("Reservation time is outside of the restaurant's opening hours.");
         }
 
+        RestaurantTable savedTable = findAvailableTable(reservationRequestDTO);
+        if (savedTable==null) {
+            throw new ReservationNotPossibleException("The reservation was not possible.");
+        }
         Reservation reservation = ReservationMapper.mapToReservation(reservationRequestDTO);
-        //for testing we add the first table
-        RestaurantTable table = tableRepository.findAll().iterator().next();
-
-        reservation.setRestaurantTable(table);
+        reservation.setRestaurantTable(savedTable);
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationMapper.mapReservationToReservationResponseDTO(savedReservation);
@@ -71,5 +73,61 @@ public class ReservationServiceImpl implements ReservationService {
         List<Reservation> allReservations = reservationRepository.findAll();
         return allReservations.stream().map((reservation ) -> ReservationMapper.mapReservationToReservationResponseDTO(reservation))
                 .collect(Collectors.toList());
+    }
+
+    public RestaurantTable findAvailableTable(ReservationRequestDTO reservationRequestDTO) {
+        var newEnd = reservationRequestDTO.getReservationEndTime();
+        var newStart = reservationRequestDTO.getReservationStartTime();
+        RestaurantTable savedTable = null;
+
+        List<RestaurantTable> allTables = tableRepository.findAll();
+
+        for (RestaurantTable restaurantTable : allTables) {
+            // Check if this table is outdoor or indoor
+            if (reservationRequestDTO.isIndoorPreference() == restaurantTable.isIndoor()) {
+                //Check if the people in the reservation can fit at the table.
+                if (reservationRequestDTO.getNumberOfGuests() <= restaurantTable.getTableCapacity()) {
+
+                    /* We check if the specific table is already reserved on the requested day.
+                       If there are no reservations for that table on that day, the table is available and can be reserved.
+                       If there are existing reservations, we compare their time slots with the requested time.
+                       If there is no time conflict with any existing reservation, the table is available, and we proceed with the reservation.
+                    */
+                    if (!reservationRepository.existsByRestaurantTable_TableId_AndReservationDay(restaurantTable.getTableId(), reservationRequestDTO.getReservationDay())) {
+                        savedTable = restaurantTable;
+
+                    }else {
+                        List<Reservation> existingReservations = reservationRepository.findByRestaurantTable_TableId_AndReservationDay((restaurantTable.getTableId()), reservationRequestDTO.getReservationDay());
+                        boolean conflictFound = false;
+
+                        for (Reservation existing : existingReservations) {
+                            if (!(newEnd.isBefore(existing.getReservationStartTime())
+                                    || newStart.isAfter(existing.getReservationEndTime()))) {
+
+                                conflictFound = true;
+                                break;
+                            }
+                        }
+                        if (!conflictFound) {
+                            savedTable = restaurantTable;
+                        }
+                    }
+                }
+            }
+        }
+        return savedTable;
+    }
+
+    @Override
+    public void deleteReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reservation with id " + reservationId + " not found."));
+
+        reservationRepository.delete(reservation);
+    }
+
+    @Override
+    public void deleteAllReservations() {
+        reservationRepository.deleteAll();
     }
 }

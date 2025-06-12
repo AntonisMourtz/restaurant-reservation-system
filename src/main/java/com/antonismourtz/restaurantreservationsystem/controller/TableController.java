@@ -1,9 +1,7 @@
 package com.antonismourtz.restaurantreservationsystem.controller;
 
-
 import com.antonismourtz.restaurantreservationsystem.dtos.request.TableRequestDTO;
 import com.antonismourtz.restaurantreservationsystem.dtos.response.TableResponseDTO;
-import com.antonismourtz.restaurantreservationsystem.exception.ResourceNotFoundException;
 import com.antonismourtz.restaurantreservationsystem.service.TableService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

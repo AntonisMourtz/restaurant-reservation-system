@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
