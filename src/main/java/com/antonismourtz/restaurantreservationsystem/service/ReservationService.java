@@ -15,4 +15,5 @@ public interface ReservationService {
     RestaurantTable findAvailableTable(ReservationRequestDTO reservationRequestDTO);
     void deleteReservation (Long reservationId);
     void deleteAllReservations();
+    boolean existsActiveReservations();
 }

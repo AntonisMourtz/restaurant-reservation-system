@@ -4,6 +4,7 @@ import com.antonismourtz.restaurantreservationsystem.dtos.request.ReservationReq
 import com.antonismourtz.restaurantreservationsystem.dtos.response.ReservationResponseDTO;
 import com.antonismourtz.restaurantreservationsystem.entity.Reservation;
 import com.antonismourtz.restaurantreservationsystem.entity.RestaurantTable;
+import com.antonismourtz.restaurantreservationsystem.exception.ActiveReservationsException;
 import com.antonismourtz.restaurantreservationsystem.exception.BusinessLogicException;
 import com.antonismourtz.restaurantreservationsystem.exception.ReservationNotPossibleException;
 import com.antonismourtz.restaurantreservationsystem.mapper.ReservationMapper;
@@ -25,7 +26,6 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationResponseDTO makeReservation(ReservationRequestDTO reservationRequestDTO) {
-
         // We check the hours are valid
         if(isReservationTimeValid(reservationRequestDTO)) {
             throw new BusinessLogicException("Start time must be earlier than end time.");
@@ -37,7 +37,6 @@ public class ReservationServiceImpl implements ReservationService {
         if(isReservationWithinOpeningHours(reservationRequestDTO)) {
             throw new ReservationNotPossibleException("Reservation time is outside of the restaurant's opening hours.");
         }
-
         RestaurantTable savedTable = findAvailableTable(reservationRequestDTO);
         if (savedTable==null) {
             throw new ReservationNotPossibleException("The reservation was not possible.");
@@ -47,6 +46,19 @@ public class ReservationServiceImpl implements ReservationService {
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationMapper.mapReservationToReservationResponseDTO(savedReservation);
+    }
+
+    @Override
+    public void deleteReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reservation with id " + reservationId + " not found."));
+
+        reservationRepository.delete(reservation);
+    }
+
+    @Override
+    public void deleteAllReservations() {
+        reservationRepository.deleteAll();
     }
 
     @Override
@@ -88,14 +100,11 @@ public class ReservationServiceImpl implements ReservationService {
                 //Check if the people in the reservation can fit at the table.
                 if (reservationRequestDTO.getNumberOfGuests() <= restaurantTable.getTableCapacity()) {
 
-                    /* We check if the specific table is already reserved on the requested day.
-                       If there are no reservations for that table on that day, the table is available and can be reserved.
-                       If there are existing reservations, we compare their time slots with the requested time.
-                       If there is no time conflict with any existing reservation, the table is available, and we proceed with the reservation.
-                    */
+                    // We check if the specific table is already reserved on the requested day.
+                    // If there are no reservations for that table on that day, the table is available and can be reserved.
                     if (!reservationRepository.existsByRestaurantTable_TableId_AndReservationDay(restaurantTable.getTableId(), reservationRequestDTO.getReservationDay())) {
                         savedTable = restaurantTable;
-
+                    // If there are existing reservations, we compare their time slots with the requested time.
                     }else {
                         List<Reservation> existingReservations = reservationRepository.findByRestaurantTable_TableId_AndReservationDay((restaurantTable.getTableId()), reservationRequestDTO.getReservationDay());
                         boolean conflictFound = false;
@@ -103,7 +112,8 @@ public class ReservationServiceImpl implements ReservationService {
                         for (Reservation existing : existingReservations) {
                             if (!(newEnd.isBefore(existing.getReservationStartTime())
                                     || newStart.isAfter(existing.getReservationEndTime()))) {
-
+                                // If there is no time conflict with any existing reservation,
+                                // the table is available, and we proceed with the reservation.
                                 conflictFound = true;
                                 break;
                             }
@@ -119,15 +129,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public void deleteReservation(Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("Reservation with id " + reservationId + " not found."));
-
-        reservationRepository.delete(reservation);
-    }
-
-    @Override
-    public void deleteAllReservations() {
-        reservationRepository.deleteAll();
+    public boolean existsActiveReservations() {
+        return !(reservationRepository.count() == 0);
     }
 }

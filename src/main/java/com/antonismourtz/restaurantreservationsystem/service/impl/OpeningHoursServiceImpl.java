@@ -3,11 +3,13 @@ package com.antonismourtz.restaurantreservationsystem.service.impl;
 import com.antonismourtz.restaurantreservationsystem.dtos.request.OpeningHoursRequestDTO;
 import com.antonismourtz.restaurantreservationsystem.dtos.response.OpeningHoursResponseDTO;
 import com.antonismourtz.restaurantreservationsystem.entity.OpeningHours;
+import com.antonismourtz.restaurantreservationsystem.exception.ActiveReservationsException;
 import com.antonismourtz.restaurantreservationsystem.exception.BusinessLogicException;
 import com.antonismourtz.restaurantreservationsystem.exception.ResourceNotFoundException;
 import com.antonismourtz.restaurantreservationsystem.mapper.OpeningHoursMapper;
 import com.antonismourtz.restaurantreservationsystem.repository.OpeningHoursRepository;
 import com.antonismourtz.restaurantreservationsystem.service.OpeningHoursService;
+import com.antonismourtz.restaurantreservationsystem.service.ReservationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 public class OpeningHoursServiceImpl implements OpeningHoursService {
     private OpeningHoursRepository openingHoursRepository;
+    private ReservationService reservationService;
 
     @Override
     public OpeningHoursResponseDTO createOpeningHours(OpeningHoursRequestDTO openingHoursRequestDTO) {
@@ -42,6 +45,9 @@ public class OpeningHoursServiceImpl implements OpeningHoursService {
     @Override
     public OpeningHoursResponseDTO updateOpeningHoursByDay(DayOfWeek dayOfWeek, OpeningHoursRequestDTO openingHoursRequestDTO) {
 
+        if(reservationService.existsActiveReservations()){
+            throw new ActiveReservationsException("Cannot modify Opening Hours. There are active reservations.");
+        }
         checkOpeningHoursRequest(openingHoursRequestDTO);
 
         OpeningHours updatedOpeningHours = openingHoursRepository.findByDayOfWeek(dayOfWeek)
@@ -58,6 +64,9 @@ public class OpeningHoursServiceImpl implements OpeningHoursService {
 
     @Override
     public void deleteAllOpeningHours() {
+        if(reservationService.existsActiveReservations()){
+            throw new ActiveReservationsException("Cannot delete Opening Hours. There are active reservations.");
+        }
         openingHoursRepository.deleteAll();
     }
 
