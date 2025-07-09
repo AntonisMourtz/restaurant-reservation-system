@@ -96,3 +96,4 @@ Admins can configure tables and weekly opening hours, while users can request re
   <li><a href="https://www.linkedin.com/in/antonis-mourtzakis/" target="_blank">LinkedIn Profile</a></li>
 </ul>
 
+
