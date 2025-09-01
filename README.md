@@ -1,99 +1,85 @@
-<h1>🍽️ Restaurant Reservation System</h1>
+# 🍽️ Restaurant Reservation System
 
-<p>A RESTful API built with Spring Boot that manages table reservations for a restaurant.<br>
-Admins can configure tables and weekly opening hours, while users can request reservations based on availability.</p>
+A RESTful API built with Spring Boot that manages table reservations for a restaurant.  
+Admins can configure tables and weekly opening hours, while users can request reservations based on availability.
 
-<hr>
+---
 
-<h2>⚙️ Tech Stack</h2>
-<ul>
-  <li>Java 17</li>
-  <li>Spring Boot (Spring Web, Spring Data JPA)</li>
-  <li>PostgreSQL</li>
-  <li>Lombok</li>
-  <li>Postman for API testing</li>
-</ul>
+## ⚙️ Tech Stack
+- Java 17
+- Spring Boot (Spring Web, Spring Data JPA)
+- PostgreSQL
+- Lombok
+- Postman for API testing
+- Swagger UI for API documentation
 
-<hr>
+---
 
-<h2>🧩 Main Entities</h2>
+## 🧩 Main Entities
 
-<h3>🪑 Restaurant Table</h3>
-<ul>
-  <li>Name (e.g. "Table 1")</li>
-  <li>Capacity (number of people)</li>
-  <li>Indoor / Outdoor</li>
-</ul>
+### 🪑 Restaurant Table
+- Name (e.g. "Table 1")
+- Capacity (number of people)
+- Indoor / Outdoor
 
-<h3>🕒 Opening Hours</h3>
-<ul>
-  <li>Day of week</li>
-  <li>Opening time / Closing time</li>
-  <li>Option to mark day as closed</li>
-</ul>
+### 🕒 Opening Hours
+- Day of week
+- Opening time / Closing time
+- Option to mark day as closed
 
-<h3>📅 Reservation</h3>
-<ul>
-  <li>Name / Email / Phone</li>
-  <li>Date / Duration (Start time - End time)</li>
-  <li>Party size</li>
-  <li>System checks availability & assigns table if possible</li>
-</ul>
+### 📅 Reservation
+- Name / Email / Phone
+- Date / Duration (Start time - End time)
+- Party size
+- System checks availability & assigns table if possible
 
-<hr>
+---
 
-<h2>🔗 API Endpoints</h1>
+## 🔗 API Endpoints
 
-   <h3>Tables (Admin)</h3>
-    <ul>
-      <li><code>POST /api/restaurant/admin/table</code> — Create a new table</li>
-      <li><code>GET /api/restaurant/admin/tables</code> — Get all tables</li>
-      <li><code>GET /api/restaurant/admin/table/{id}</code> — Get a specific table</li>
-      <li><code>PUT /api/restaurant/admin/table/{id}</code> — Update a specific table</li>
-      <li><code>DELETE /api/restaurant/admin/table/{id}</code> — Delete a specific table</li>
-  </ul>
-  
-   <h3>Opening Hours (Admin / Read-only for Users)</h3>
-    <ul>
-      <li><code>POST /api/restaurant/admin/opening_hours</code> — Create new opening hours</li>
-      <li><code>GET /api/restaurant/opening_hours</code> — View opening hours</li>
-      <li><code>PUT /api/restaurant/admin/opening_hours/{day}</code> — Update opening hours</li>
-      <li><code>DELETE /api/restaurant/admin/opening_hours</code> — Delete all opening hours</li>
-  </ul>
-  
-   <h3>Reservations (User)</h3>
-    <ul>
-      <li><code>POST /api/restaurant/reservation</code> — Create a reservation (system auto-assigns a table)</li>
-      <li><code>GET /api/restaurant/admin/reservations</code> — (Admin only) View all reservations</li>
-      <li><code>DELETE /api/restaurant/admin/reservations</code> — Delete all reservations</li>
-      <li><code>DELETE /api/restaurant/admin/reservation/{id}</code> — Delete a specific reservation</li>
-  </ul>
+### Tables (Admin)
+- `POST /api/restaurant/admin/table` — Create a new table
+- `GET /api/restaurant/admin/tables` — Get all tables
+- `GET /api/restaurant/admin/table/{id}` — Get a specific table
+- `PUT /api/restaurant/admin/table/{id}` — Update a specific table
+- `DELETE /api/restaurant/admin/table/{id}` — Delete a specific table
 
-<hr>
+### Opening Hours (Admin / Read-only for Users)
+- `POST /api/restaurant/admin/opening_hours` — Create new opening hours
+- `GET /api/restaurant/opening_hours` — View opening hours
+- `PUT /api/restaurant/admin/opening_hours/{day}` — Update opening hours
+- `DELETE /api/restaurant/admin/opening_hours` — Delete all opening hours
 
-<h2>📌 Assumptions</h2>
-<ul>
-  <li>No authentication implemented (admin/user separation is theoretical for now)</li>
-  <li>A reservation is valid only if there is an available table at the requested time</li>
-  <li>Opening hours and Tables are editable only by admins</li>
-</ul>
+### Reservations (User)
+- `POST /api/restaurant/reservation` — Create a reservation (system auto-assigns a table)
+- `GET /api/restaurant/admin/reservations` — View all reservations
+- `DELETE /api/restaurant/admin/reservations` — Delete all reservations
+- `DELETE /api/restaurant/admin/reservation/{id}` — Delete a specific reservation
 
-<hr>
+---
 
-<h2>🔮 Future Enhancements</h2>
-<ul>
-  <li>Add JWT-based authorization</li>
-  <li>Add Swagger for live API documentation</li>
-  <li>Add Docker support for deployment</li>
-</ul>
+## 📌 Assumptions
+- No authentication implemented (admin/user separation is theoretical for now)
+- A reservation is valid only if there is an available table at the requested time
+- Opening hours and Tables are editable only by admins
 
-<hr>
+---
 
-<h2>👤 Author</h2>
-<ul>
-  <li>Antonis Mourtzakis</li>
-  <li>antmourtzakis@gmail.com</li>
-  <li><a href="https://www.linkedin.com/in/antonis-mourtzakis/" target="_blank">LinkedIn Profile</a></li>
-</ul>
+## 📖 API Documentation
 
+Once the application is running, you can explore the API using Swagger UI:
 
+- [Swagger UI](http://localhost:8080/swagger-ui/index.html)
+
+---
+
+## 🔮 Future Enhancements
+- Add JWT-based authorization
+- Add Docker support for deployment
+
+---
+
+## 👤 Author
+- Antonis Mourtzakis
+- antmourtzakis@gmail.com
+- [LinkedIn Profile](https://www.linkedin.com/in/antonis-mourtzakis/)
