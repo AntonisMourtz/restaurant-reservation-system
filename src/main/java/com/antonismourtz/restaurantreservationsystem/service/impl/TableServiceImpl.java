@@ -34,6 +34,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public TableResponseDTO getTableById(long tableId) {
+
         RestaurantTable restaurantTable = tableRepository.findById(tableId)
                 .orElseThrow(()-> new ResourceNotFoundException("Table not found with ID: " + tableId));
 
@@ -42,6 +43,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public List<TableResponseDTO> getAllTables() {
+
         List<RestaurantTable> allTables = tableRepository.findAll();
 
         return allTables.stream().map((restaurantTable) -> TableMapper.EntityToTableResponseDto(restaurantTable))
@@ -50,6 +52,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public TableResponseDTO updateTable(long tableId, TableRequestDTO tableRequestDTO) {
+
         if(reservationService.existsActiveReservations()){
             throw new ActiveReservationsException("Cannot modify tables. There are active reservations.");
         }
@@ -68,11 +71,14 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public void deleteTable(long tableId) {
+
         if(reservationService.existsActiveReservations()){
             throw new ActiveReservationsException("Cannot delete tables. There are active reservations.");
         }
+
         RestaurantTable restaurantTable = tableRepository.findById(tableId)
                 .orElseThrow(()-> new ResourceNotFoundException("Table not found with ID: " + tableId));
+
         tableRepository.delete(restaurantTable);
     }
 }

@@ -4,7 +4,6 @@ import com.antonismourtz.restaurantreservationsystem.dtos.request.ReservationReq
 import com.antonismourtz.restaurantreservationsystem.dtos.response.ReservationResponseDTO;
 import com.antonismourtz.restaurantreservationsystem.entity.Reservation;
 import com.antonismourtz.restaurantreservationsystem.entity.RestaurantTable;
-import com.antonismourtz.restaurantreservationsystem.exception.ActiveReservationsException;
 import com.antonismourtz.restaurantreservationsystem.exception.BusinessLogicException;
 import com.antonismourtz.restaurantreservationsystem.exception.ReservationNotPossibleException;
 import com.antonismourtz.restaurantreservationsystem.mapper.ReservationMapper;
@@ -20,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
+
     private TableRepository tableRepository;
     private ReservationRepository reservationRepository;
     private OpeningHoursRepository openingHoursRepository;
@@ -34,13 +34,17 @@ public class ReservationServiceImpl implements ReservationService {
         if(!checkDayOfReservation(reservationRequestDTO)) {
             throw new ReservationNotPossibleException("The restaurant is closed at this day.");
         }
+
         if(isReservationWithinOpeningHours(reservationRequestDTO)) {
             throw new ReservationNotPossibleException("Reservation time is outside of the restaurant's opening hours.");
         }
+
         RestaurantTable savedTable = findAvailableTable(reservationRequestDTO);
+
         if (savedTable==null) {
             throw new ReservationNotPossibleException("The reservation was not possible.");
         }
+
         Reservation reservation = ReservationMapper.mapToReservation(reservationRequestDTO);
         reservation.setRestaurantTable(savedTable);
 
@@ -50,6 +54,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public void deleteReservation(Long reservationId) {
+
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("Reservation with id " + reservationId + " not found."));
 
@@ -72,6 +77,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public boolean isReservationWithinOpeningHours(ReservationRequestDTO reservationRequestDTO) {
+
         var reservationStartTime= reservationRequestDTO.getReservationStartTime();
         var reservationEndTime = reservationRequestDTO.getReservationEndTime();
         var openTime = openingHoursRepository.findByDayOfWeek(reservationRequestDTO.getReservationDay()).get().getOpenTime();
@@ -82,12 +88,15 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getAllReservations() {
+
         List<Reservation> allReservations = reservationRepository.findAll();
-        return allReservations.stream().map((reservation ) -> ReservationMapper.mapReservationToReservationResponseDTO(reservation))
+        return allReservations.stream()
+                .map((reservation ) -> ReservationMapper.mapReservationToReservationResponseDTO(reservation))
                 .collect(Collectors.toList());
     }
 
     public RestaurantTable findAvailableTable(ReservationRequestDTO reservationRequestDTO) {
+
         var newEnd = reservationRequestDTO.getReservationEndTime();
         var newStart = reservationRequestDTO.getReservationStartTime();
         RestaurantTable savedTable = null;
@@ -99,17 +108,20 @@ public class ReservationServiceImpl implements ReservationService {
             if (reservationRequestDTO.isIndoorPreference() == restaurantTable.isIndoor()) {
                 //Check if the people in the reservation can fit at the table.
                 if (reservationRequestDTO.getNumberOfGuests() <= restaurantTable.getTableCapacity()) {
-
                     // We check if the specific table is already reserved on the requested day.
                     // If there are no reservations for that table on that day, the table is available and can be reserved.
                     if (!reservationRepository.existsByRestaurantTable_TableId_AndReservationDay(restaurantTable.getTableId(), reservationRequestDTO.getReservationDay())) {
                         savedTable = restaurantTable;
                     // If there are existing reservations, we compare their time slots with the requested time.
                     }else {
-                        List<Reservation> existingReservations = reservationRepository.findByRestaurantTable_TableId_AndReservationDay((restaurantTable.getTableId()), reservationRequestDTO.getReservationDay());
+
+                        List<Reservation> existingReservations = reservationRepository
+                                .findByRestaurantTable_TableId_AndReservationDay((restaurantTable.getTableId()), reservationRequestDTO.getReservationDay());
+
                         boolean conflictFound = false;
 
                         for (Reservation existing : existingReservations) {
+
                             if (!(newEnd.isBefore(existing.getReservationStartTime())
                                     || newStart.isAfter(existing.getReservationEndTime()))) {
                                 // If there is no time conflict with any existing reservation,
@@ -118,7 +130,9 @@ public class ReservationServiceImpl implements ReservationService {
                                 break;
                             }
                         }
+
                         if (!conflictFound) {
+
                             savedTable = restaurantTable;
                         }
                     }

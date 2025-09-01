@@ -12,7 +12,6 @@ import com.antonismourtz.restaurantreservationsystem.service.OpeningHoursService
 import com.antonismourtz.restaurantreservationsystem.service.ReservationService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 
 public class OpeningHoursServiceImpl implements OpeningHoursService {
+
     private OpeningHoursRepository openingHoursRepository;
     private ReservationService reservationService;
 
@@ -31,11 +31,13 @@ public class OpeningHoursServiceImpl implements OpeningHoursService {
 
         OpeningHours openingHours = OpeningHoursMapper.MapToOpeningHours(openingHoursRequestDTO);
         OpeningHours savedOpeningHours = openingHoursRepository.save(openingHours);
+
         return OpeningHoursMapper.MapToOpeningHoursResponseDTO(savedOpeningHours);
     }
 
     @Override
     public List<OpeningHoursResponseDTO> getAllOpeningHours() {
+
         List<OpeningHours> allOpeningHours = openingHoursRepository.findAll();
 
         return allOpeningHours.stream().map((openingHours) -> OpeningHoursMapper.MapToOpeningHoursResponseDTO(openingHours))
@@ -48,6 +50,7 @@ public class OpeningHoursServiceImpl implements OpeningHoursService {
         if(reservationService.existsActiveReservations()){
             throw new ActiveReservationsException("Cannot modify Opening Hours. There are active reservations.");
         }
+
         checkOpeningHoursRequest(openingHoursRequestDTO);
 
         OpeningHours updatedOpeningHours = openingHoursRepository.findByDayOfWeek(dayOfWeek)
@@ -64,24 +67,29 @@ public class OpeningHoursServiceImpl implements OpeningHoursService {
 
     @Override
     public void deleteAllOpeningHours() {
+
         if(reservationService.existsActiveReservations()){
             throw new ActiveReservationsException("Cannot delete Opening Hours. There are active reservations.");
         }
+
         openingHoursRepository.deleteAll();
     }
 
     @Override
     public void checkOpeningHoursRequest(OpeningHoursRequestDTO openingHoursRequestDTO) {
+
         if (openingHoursRequestDTO.isOpen()==true &&
                 (openingHoursRequestDTO.getOpenTime()==null || openingHoursRequestDTO.getCloseTime()==null)) {
 
             throw new BusinessLogicException("Opening hours are required if the restaurant is open.");
         }
+
         if (openingHoursRequestDTO.isOpen()==false &&
                 (openingHoursRequestDTO.getOpenTime()!=null || openingHoursRequestDTO.getCloseTime()!=null)) {
 
             throw new BusinessLogicException("Please remove opening hours if the restaurant is closed.");
         }
+
         if(openingHoursRequestDTO.getOpenTime()!=null && openingHoursRequestDTO.getCloseTime()!=null &&
                 (openingHoursRequestDTO.getCloseTime().isBefore(openingHoursRequestDTO.getOpenTime()))) {
 
